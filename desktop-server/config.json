@@ -23,7 +23,7 @@
       "color": "#1E6BFF",
       "columns": 3,
       "keys": [
-        {"id": "btn_palette", "label": "Palette", "icon": "search", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "shift", "p"]}}},
+        {"id": "btn_palette", "label": "Palette", "icon": "search", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["f1"]}}},
         {"id": "btn_quickopen", "label": "Quick Open", "icon": "file", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "p"]}}},
         {"id": "btn_terminal", "label": "Terminal", "icon": "terminal", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "`"]}}},
         {"id": "btn_comment", "label": "Comment", "icon": "comment", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "/"]}}},

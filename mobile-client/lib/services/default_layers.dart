@@ -12,7 +12,7 @@ final List<Layer> defaultLayers = [
     color: Palette.blue,
     columns: 3,
     keys: [
-      MacroKey(id: 'btn_palette', label: 'Palette', icon: 'search', action: MacroAction.combo(['mod', 'shift', 'p'])),
+      MacroKey(id: 'btn_palette', label: 'Palette', icon: 'search', action: MacroAction.combo(['f1'])),
       MacroKey(id: 'btn_quickopen', label: 'Quick Open', icon: 'file', action: MacroAction.combo(['mod', 'p'])),
       MacroKey(id: 'btn_terminal', label: 'Terminal', icon: 'terminal', action: MacroAction.combo(['ctrl', '`'])),
       MacroKey(id: 'btn_comment', label: 'Comment', icon: 'comment', action: MacroAction.combo(['mod', '/'])),
