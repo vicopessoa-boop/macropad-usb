@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'services/macropad_connection.dart';
 import 'services/settings_store.dart';
 import 'ui/macropad_screen.dart';
+import 'ui/palette.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +26,9 @@ class MacropadApp extends StatelessWidget {
       title: 'Macropad USB',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00E5FF), brightness: Brightness.dark),
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Palette.background,
+        colorScheme: ColorScheme.fromSeed(seedColor: Palette.blue, brightness: Brightness.light),
         useMaterial3: true,
       ),
       home: MacropadScreen(connection: connection),

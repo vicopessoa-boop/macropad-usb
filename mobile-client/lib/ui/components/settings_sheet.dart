@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/macropad_connection.dart';
 import '../../services/settings_store.dart';
+import '../palette.dart';
 
 /// Configuração do endereço do daemon. Via cabo (adb reverse) o padrão 127.0.0.1:8080
 /// funciona sem mudanças; troque o host apenas no fallback por USB tethering.
@@ -9,7 +10,7 @@ Future<void> showSettingsSheet(BuildContext context, MacropadConnection connecti
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: const Color(0xFF12141A),
+    backgroundColor: Palette.surface,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
     builder: (_) => _SettingsSheet(connection: connection),
   );
@@ -39,7 +40,10 @@ class _SettingsSheetState extends State<_SettingsSheet> {
   Future<void> _save() async {
     final port = int.tryParse(_port.text.trim()) ?? ConnectionSettings.defaultPort;
     final settings = ConnectionSettings(
-        host: _host.text.trim().isEmpty ? '127.0.0.1' : _host.text.trim(), port: port, token: _token.text.trim());
+      host: _host.text.trim().isEmpty ? '127.0.0.1' : _host.text.trim(),
+      port: port,
+      token: _token.text.trim(),
+    );
     await settings.save();
     widget.connection.reconfigure(host: settings.host, port: settings.port, token: settings.token);
     if (mounted) Navigator.pop(context);
@@ -59,11 +63,14 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           Text(
             'Cabo USB + Depuração USB: mantenha 127.0.0.1 (o daemon faz o adb reverse).\n'
             'USB tethering: use o IP do computador na interface do tethering.',
-            style: const TextStyle(color: Colors.white60, fontSize: 12),
+            style: const TextStyle(color: Palette.textMuted, fontSize: 12),
           ),
           if (c.serverBackend != null) ...[
             const SizedBox(height: 6),
-            Text('Backend do desktop: ${c.serverBackend}', style: const TextStyle(color: Colors.white60, fontSize: 12)),
+            Text(
+              'Backend do desktop: ${c.serverBackend}',
+              style: const TextStyle(color: Palette.textMuted, fontSize: 12),
+            ),
           ],
           if (c.lastError != null) ...[
             const SizedBox(height: 6),
@@ -74,7 +81,10 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             children: [
               Expanded(
                 flex: 3,
-                child: TextField(controller: _host, decoration: const InputDecoration(labelText: 'Host')),
+                child: TextField(
+                  controller: _host,
+                  decoration: const InputDecoration(labelText: 'Host'),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(

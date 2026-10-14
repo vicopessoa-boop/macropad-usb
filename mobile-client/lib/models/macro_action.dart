@@ -20,10 +20,8 @@ class MacroAction {
         if (timeoutSec != null) 'timeout_sec': timeoutSec,
       });
 
-  factory MacroAction.fromJson(Map<String, dynamic> json) => MacroAction(
-        json['action_type'] as String,
-        Map<String, dynamic>.from(json['payload'] as Map? ?? const {}),
-      );
+  factory MacroAction.fromJson(Map<String, dynamic> json) =>
+      MacroAction(json['action_type'] as String, Map<String, dynamic>.from(json['payload'] as Map? ?? const {}));
 
   /// Mensagem do protocolo: { "type": "ACTION", "action_type": ..., "payload": ... }
   Map<String, dynamic> toMessage({required String buttonId, required String requestId}) => {

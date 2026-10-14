@@ -13,12 +13,14 @@ import 'package:macropad_usb/ui/macropad_screen.dart';
 
 void main() {
   test('Layer.fromJson lê o formato do config.json do desktop', () {
-    final layers = Layer.listFromJson(jsonDecode('''[
+    final layers = Layer.listFromJson(
+      jsonDecode('''[
       {"id":"git","name":"Git","color":"#7CFF00","columns":4,"keys":[
         {"id":"btn_push","label":"Push","confirm":true,"color":"#FF6B00",
          "action":{"action_type":"EXEC_SHELL","payload":{"command":"git push"}}}
       ]}
-    ]''') as List);
+    ]''') as List,
+    );
     final k = layers.single.keys.single;
     expect(layers.single.columns, 4);
     expect(layers.single.color, const Color(0xFF7CFF00));
@@ -50,12 +52,14 @@ void main() {
     final received = Completer<Map<String, dynamic>>();
     server.listen((req) async {
       final ws = await WebSocketTransformer.upgrade(req);
-      ws.add(jsonEncode({
-        'type': 'LAYOUT',
-        'layers': [
-          {'id': 'x', 'name': 'X', 'keys': []}
-        ]
-      }));
+      ws.add(
+        jsonEncode({
+          'type': 'LAYOUT',
+          'layers': [
+            {'id': 'x', 'name': 'X', 'keys': []},
+          ],
+        }),
+      );
       ws.listen((data) {
         final msg = Map<String, dynamic>.from(jsonDecode(data as String) as Map);
         if (msg['type'] == 'ACTION') {
@@ -75,7 +79,7 @@ void main() {
     final msg = await received.future.timeout(const Duration(seconds: 2));
     expect(msg['action_type'], 'KEY_COMBO');
     expect(msg['payload'], {
-      'keys': ['ctrl', 'shift', 'p']
+      'keys': ['ctrl', 'shift', 'p'],
     });
     expect((await status.timeout(const Duration(seconds: 2))).status, KeyStatus.running);
     expect(conn.remoteLayers.value?.single.id, 'x');

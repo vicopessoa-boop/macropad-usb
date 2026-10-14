@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../models/macro_key.dart';
 import '../../models/status_update.dart';
+import '../palette.dart';
 
 /// Keycap mecânico com retroiluminação RGB.
 ///
@@ -48,12 +49,19 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     duration: const Duration(milliseconds: 60),
     reverseDuration: const Duration(milliseconds: 520),
   );
-  late final AnimationController _ripple =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
-  late final AnimationController _flash =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 1600), value: 1);
-  late final AnimationController _running =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
+  late final AnimationController _ripple = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 480),
+  );
+  late final AnimationController _flash = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+    value: 1,
+  );
+  late final AnimationController _running = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 650),
+  );
   late final AnimationController _hold = AnimationController(vsync: this, duration: _holdDuration);
 
   int? _pointer;
@@ -251,48 +259,60 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = enabled
-        ? Color.lerp(const Color(0xFFB8C0CC), Colors.white, (glow - 0.2).clamp(0.0, 1.0))!
-        : const Color(0xFF5A606A);
+    final textColor =
+        enabled ? Color.lerp(Palette.text, Palette.textStrong, (glow - 0.2).clamp(0.0, 1.0))! : Palette.textDisabled;
+    // No fundo claro o brilho da legenda é discreto: um halo leve na cor da tecla.
     final shadows = [
-      Shadow(color: color.withValues(alpha: (0.9 * glow).clamp(0.0, 1.0)), blurRadius: 6 + 10 * glow),
+      Shadow(
+        color: color.withValues(alpha: (0.35 * glow).clamp(0.0, 1.0)),
+        blurRadius: 4 + 6 * glow,
+      ),
     ];
-    return LayoutBuilder(builder: (context, c) {
-      final base = math.min(c.maxWidth, c.maxHeight);
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) Icon(icon, size: base * 0.30, color: Color.lerp(textColor, color, 0.55), shadows: shadows),
-          if (icon != null) SizedBox(height: base * 0.05),
-          Text(
-            label,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: textColor,
-              fontSize: (base * 0.13).clamp(10.0, 16.0),
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.4,
-              shadows: shadows,
+    return LayoutBuilder(
+      builder: (context, c) {
+        final base = math.min(c.maxWidth, c.maxHeight);
+        // scaleDown: em teclas pequenas a legenda encolhe em vez de vazar da tecla.
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: c.maxWidth),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) Icon(icon, size: base * 0.30, color: enabled ? color : textColor, shadows: shadows),
+                if (icon != null) SizedBox(height: base * 0.05),
+                Text(
+                  label,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: (base * 0.13).clamp(10.0, 16.0),
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    shadows: shadows,
+                  ),
+                ),
+                if (badge != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      badge!,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: (base * 0.10).clamp(9.0, 12.0),
+                        fontWeight: FontWeight.w700,
+                        shadows: shadows,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
-          if (badge != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                badge!,
-                style: TextStyle(
-                  color: color,
-                  fontSize: (base * 0.10).clamp(9.0, 12.0),
-                  fontWeight: FontWeight.w700,
-                  shadows: shadows,
-                ),
-              ),
-            ),
-        ],
-      );
-    });
+        );
+      },
+    );
   }
 }
 
@@ -331,27 +351,27 @@ class KeycapPainter extends CustomPainter {
     final capRect = Rect.fromLTWH(3, dy, size.width - 6, size.height - _skirtDepth - _travel + 2);
     final cap = RRect.fromRectAndRadius(capRect, const Radius.circular(13));
 
-    // 1. Bloom: halo desfocado atrás da tecla (o "vazamento" do LED).
+    // 1. Bloom: halo colorido desfocado atrás da tecla (o "vazamento" do LED).
     canvas.drawRRect(
       skirt.inflate(1),
       Paint()
-        ..color = color.withValues(alpha: (0.50 * g).clamp(0.0, 1.0))
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 6 + 14 * g),
+        ..color = color.withValues(alpha: (0.38 * g).clamp(0.0, 1.0))
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 6 + 12 * g),
     );
 
-    // 2. Saia do keycap (profundidade) com um fio de luz por baixo.
-    canvas.drawRRect(skirt, Paint()..color = const Color(0xFF06070A));
+    // 2. Saia do keycap (profundidade) com um fio de cor por baixo.
+    canvas.drawRRect(skirt, Paint()..color = Color.lerp(Palette.capSkirt, color, 0.25)!);
     canvas.drawRRect(
       skirt,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
-        ..color = color.withValues(alpha: 0.18 + 0.35 * g1),
+        ..color = color.withValues(alpha: 0.25 + 0.35 * g1),
     );
 
-    // 3. Topo do keycap: plástico escuro, levemente tingido pela luz quando pressionado.
-    final top = Color.lerp(const Color(0xFF262A33), color, 0.10 * press + 0.04 * g1)!;
-    final bottom = Color.lerp(const Color(0xFF101217), color, 0.06 * press)!;
+    // 3. Topo do keycap: plástico claro, tingido pela cor da tecla quando pressionado.
+    final top = Color.lerp(Palette.capTop, color, 0.14 * press + 0.04 * g1)!;
+    final bottom = Color.lerp(Palette.capBottom, color, 0.10 * press + 0.03 * g1)!;
     canvas.drawRRect(
       cap,
       Paint()
@@ -371,7 +391,10 @@ class KeycapPainter extends CustomPainter {
         ..shader = RadialGradient(
           center: const Alignment(0, -0.1),
           radius: 0.8,
-          colors: [color.withValues(alpha: 0.22 * g1), color.withValues(alpha: 0)],
+          colors: [
+            color.withValues(alpha: 0.14 * g1),
+            color.withValues(alpha: 0),
+          ],
         ).createShader(capRect),
     );
 
@@ -402,7 +425,7 @@ class KeycapPainter extends CustomPainter {
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.white.withValues(alpha: 0.07), Colors.white.withValues(alpha: 0)],
+          colors: [Colors.white.withValues(alpha: 0.6), Colors.white.withValues(alpha: 0)],
         ).createShader(capRect),
     );
     canvas.restore();
@@ -414,15 +437,15 @@ class KeycapPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2 + 2 * g
-        ..color = color.withValues(alpha: borderAlpha * 0.8)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2 + 4 * g),
+        ..color = color.withValues(alpha: borderAlpha * 0.55)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2 + 3 * g),
     );
     canvas.drawRRect(
       cap,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2 + 1.0 * press
-        ..color = Color.lerp(color, Colors.white, 0.25 * press)!.withValues(alpha: borderAlpha),
+        ..strokeWidth = 1.5 + 1.0 * press
+        ..color = color.withValues(alpha: borderAlpha),
     );
 
     // 7. Anel de progresso das teclas que exigem segurar.
@@ -435,8 +458,8 @@ class KeycapPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = 3
             ..strokeCap = StrokeCap.round
-            ..color = Colors.white.withValues(alpha: 0.9)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 3),
+            ..color = Palette.textStrong.withValues(alpha: 0.85)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2),
         );
       }
     }

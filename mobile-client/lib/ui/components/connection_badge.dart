@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/macropad_connection.dart';
+import '../palette.dart';
 
 /// Indicador de conexão: LED + estado + latência. Toque para abrir as configurações.
 class ConnectionBadge extends StatelessWidget {
@@ -16,11 +17,11 @@ class ConnectionBadge extends StatelessWidget {
       builder: (context, _) {
         final (color, text) = switch (connection.phase) {
           ConnectionPhase.connected => (
-              const Color(0xFF00FF66),
+              const Color(0xFF00A859),
               connection.latencyMs == null ? 'USB conectado' : 'USB · ${connection.latencyMs} ms',
             ),
-          ConnectionPhase.connecting => (const Color(0xFFFFB000), 'Conectando…'),
-          ConnectionPhase.disconnected => (const Color(0xFFFF2D55), 'Desconectado'),
+          ConnectionPhase.connecting => (const Color(0xFFE09A00), 'Conectando…'),
+          ConnectionPhase.disconnected => (const Color(0xFFE5243F), 'Desconectado'),
         };
         return InkWell(
           borderRadius: BorderRadius.circular(20),
@@ -28,7 +29,7 @@ class ConnectionBadge extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF12141A),
+              color: Palette.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: color.withValues(alpha: 0.5)),
             ),
@@ -45,7 +46,10 @@ class ConnectionBadge extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                Text(
+                  text,
+                  style: const TextStyle(color: Palette.text, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
               ],
             ),
           ),

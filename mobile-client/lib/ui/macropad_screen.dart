@@ -12,6 +12,7 @@ import 'components/connection_badge.dart';
 import 'components/layer_bar.dart';
 import 'components/neon_key.dart';
 import 'components/settings_sheet.dart';
+import 'palette.dart';
 
 class MacropadScreen extends StatefulWidget {
   final MacropadConnection connection;
@@ -64,10 +65,12 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
     if (!_conn.sendAction(key.id, key.action)) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(
-          content: Text('Sem conexão com o desktop. Verifique o cabo e o daemon.'),
-          duration: Duration(milliseconds: 1500),
-        ));
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Sem conexão com o desktop. Verifique o cabo e o daemon.'),
+            duration: Duration(milliseconds: 1500),
+          ),
+        );
     }
   }
 
@@ -83,7 +86,7 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     final layer = _layers[_current];
     return Scaffold(
-      backgroundColor: const Color(0xFF050608),
+      backgroundColor: Palette.background,
       body: TweenAnimationBuilder<Color?>(
         tween: ColorTween(end: layer.color),
         duration: const Duration(milliseconds: 400),
@@ -92,7 +95,7 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
             gradient: RadialGradient(
               center: const Alignment(0, -1.1),
               radius: 1.4,
-              colors: [(tint ?? layer.color).withValues(alpha: 0.16), const Color(0xFF050608)],
+              colors: [(tint ?? layer.color).withValues(alpha: 0.10), Palette.background],
             ),
           ),
           child: child,
@@ -114,7 +117,7 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 4,
-                          color: Colors.white,
+                          color: Palette.textStrong,
                         ),
                       ),
                     ),
@@ -179,35 +182,34 @@ class _KeyGrid extends StatelessWidget {
     const gap = 16.0;
     const pad = 20.0;
 
-    return LayoutBuilder(builder: (context, c) {
-      final cellW = (c.maxWidth - pad * 2 - gap * (cols - 1)) / cols;
-      final cellH = (c.maxHeight - pad * 2 - gap * (rows - 1)) / rows;
-      final cell = math.max(40.0, math.min(cellW, cellH));
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var r = 0; r < rows; r++)
-              Padding(
-                padding: EdgeInsets.only(top: r == 0 ? 0 : gap),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var col = 0; col < cols; col++)
-                      Padding(
-                        padding: EdgeInsets.only(left: col == 0 ? 0 : gap),
-                        child: SizedBox.square(
-                          dimension: cell,
-                          child: _buildKey(r * cols + col, cols),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final cellW = (c.maxWidth - pad * 2 - gap * (cols - 1)) / cols;
+        final cellH = (c.maxHeight - pad * 2 - gap * (rows - 1)) / rows;
+        final cell = math.max(40.0, math.min(cellW, cellH));
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var r = 0; r < rows; r++)
+                Padding(
+                  padding: EdgeInsets.only(top: r == 0 ? 0 : gap),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var col = 0; col < cols; col++)
+                        Padding(
+                          padding: EdgeInsets.only(left: col == 0 ? 0 : gap),
+                          child: SizedBox.square(dimension: cell, child: _buildKey(r * cols + col, cols)),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget? _buildKey(int index, int cols) {
@@ -245,7 +247,7 @@ class _Console extends StatelessWidget {
               margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF0B0D11),
+                color: Palette.surface,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: s.color.withValues(alpha: 0.5)),
               ),
@@ -257,7 +259,7 @@ class _Console extends StatelessWidget {
                   fontFamily: 'monospace',
                   fontSize: 11,
                   height: 1.3,
-                  color: Color.lerp(Colors.white70, s.color, 0.35),
+                  color: Color.lerp(Palette.text, s.color, 0.35),
                 ),
               ),
             ),

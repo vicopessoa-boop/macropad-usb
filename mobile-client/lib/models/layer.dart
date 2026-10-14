@@ -10,13 +10,7 @@ class Layer {
   final int columns;
   final List<MacroKey> keys;
 
-  const Layer({
-    required this.id,
-    required this.name,
-    required this.color,
-    required this.keys,
-    this.columns = 3,
-  });
+  const Layer({required this.id, required this.name, required this.color, required this.keys, this.columns = 3});
 
   factory Layer.fromJson(Map<String, dynamic> json) => Layer(
         id: json['id'] as String,
@@ -24,10 +18,11 @@ class Layer {
         color: parseHexColor(json['color'] as String?) ?? const Color(0xFF00E5FF),
         columns: ((json['columns'] as num?)?.toInt() ?? 3).clamp(1, 6),
         keys: [
-          for (final k in (json['keys'] as List? ?? const [])) MacroKey.fromJson(Map<String, dynamic>.from(k as Map)),
+          for (final k in (json['keys'] as List? ?? const [])) MacroKey.fromJson(Map<String, dynamic>.from(k as Map))
         ],
       );
 
-  static List<Layer> listFromJson(List<dynamic> json) =>
-      [for (final l in json) Layer.fromJson(Map<String, dynamic>.from(l as Map))];
+  static List<Layer> listFromJson(List<dynamic> json) => [
+        for (final l in json) Layer.fromJson(Map<String, dynamic>.from(l as Map)),
+      ];
 }
