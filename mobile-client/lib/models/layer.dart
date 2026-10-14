@@ -10,13 +10,24 @@ class Layer {
   final int columns;
   final List<MacroKey> keys;
 
-  const Layer({required this.id, required this.name, required this.color, required this.keys, this.columns = 3});
+  /// Painel extra no topo da layer. Hoje: "claude" (visor de status do Claude Code).
+  final String? visor;
+
+  const Layer({
+    required this.id,
+    required this.name,
+    required this.color,
+    required this.keys,
+    this.columns = 3,
+    this.visor,
+  });
 
   factory Layer.fromJson(Map<String, dynamic> json) => Layer(
         id: json['id'] as String,
         name: json['name'] as String? ?? json['id'] as String,
         color: parseHexColor(json['color'] as String?) ?? const Color(0xFF00E5FF),
         columns: ((json['columns'] as num?)?.toInt() ?? 3).clamp(1, 6),
+        visor: json['visor'] as String?,
         keys: [
           for (final k in (json['keys'] as List? ?? const [])) MacroKey.fromJson(Map<String, dynamic>.from(k as Map))
         ],

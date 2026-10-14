@@ -11,6 +11,7 @@ final List<Layer> defaultLayers = [
     name: 'VS Code',
     color: Palette.blue,
     columns: 3,
+    visor: 'claude',
     keys: [
       MacroKey(id: 'btn_palette', label: 'Palette', icon: 'search', action: MacroAction.combo(['f1'])),
       MacroKey(id: 'btn_quickopen', label: 'Quick Open', icon: 'file', action: MacroAction.combo(['mod', 'p'])),

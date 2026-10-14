@@ -8,6 +8,7 @@ import '../models/macro_key.dart';
 import '../models/status_update.dart';
 import '../services/default_layers.dart';
 import '../services/macropad_connection.dart';
+import 'components/claude_visor.dart';
 import 'components/connection_badge.dart';
 import 'components/layer_bar.dart';
 import 'components/neon_key.dart';
@@ -128,6 +129,14 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
                 ),
               ),
               LayerBar(layers: _layers, current: _current, onSelect: (i) => setState(() => _current = i)),
+              if (layer.visor == 'claude')
+                ListenableBuilder(
+                  listenable: _conn,
+                  builder: (context, _) => ClaudeVisor(
+                    sessions: _conn.claudeSessions,
+                    connected: _conn.phase == ConnectionPhase.connected,
+                  ),
+                ),
               Expanded(
                 child: ListenableBuilder(
                   listenable: _conn,

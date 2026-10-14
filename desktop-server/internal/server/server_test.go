@@ -152,3 +152,37 @@ func TestShellAllowlistBlocks(t *testing.T) {
 		t.Fatalf("deveria bloquear: %v", m)
 	}
 }
+
+func TestClaudeHookUpdatesVisor(t *testing.T) {
+	ts, _ := setup(t, config.Default())
+	c := dial(t, ts, nil)
+	readUntil(t, c, func(m map[string]any) bool { return m["type"] == "CLAUDE_STATUS" })
+
+	post := func(body string, origin string) int {
+		req, _ := http.NewRequest(http.MethodPost, ts.URL+"/claude", strings.NewReader(body))
+		if origin != "" {
+			req.Header.Set("Origin", origin)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		return resp.StatusCode
+	}
+	if code := post(`{"session_id":"x","hook_event_name":"Stop"}`, "https://evil.example"); code != http.StatusForbidden {
+		t.Fatalf("navegador deveria ser recusado, got %d", code)
+	}
+	code := post(`{"session_id":"x","cwd":"C:\\Users\\Acer\\zx-control-semana1","hook_event_name":"Notification","notification_type":"permission_prompt"}`, "")
+	if code != http.StatusNoContent {
+		t.Fatalf("status %d", code)
+	}
+	m := readUntil(t, c, func(m map[string]any) bool {
+		ss, _ := m["sessions"].([]any)
+		return m["type"] == "CLAUDE_STATUS" && len(ss) == 1
+	})
+	sess := m["sessions"].([]any)[0].(map[string]any)
+	if sess["state"] != "waiting" || sess["project"] != "zx-control-semana1" {
+		t.Fatalf("%v", sess)
+	}
+}

@@ -2,61 +2,43 @@
   "listen_addr": "127.0.0.1",
   "port": 8091,
   "token": "",
-  "adb": { "enabled": true, "path": "C:\\platform-tools\\adb.exe", "watch_interval_sec": 3 },
-  "shell": { "enabled": true, "allowlist": [], "default_cwd": "~", "default_timeout_sec": 300, "max_concurrent": 4 },
+  "adb": {"enabled": true, "path": "C:\\platform-tools\\adb.exe", "watch_interval_sec": 3},
+  "shell": {"enabled": true, "allowlist": [], "default_cwd": "~", "default_timeout_sec": 300, "max_concurrent": 4},
   "type_delay_ms": 2,
   "restore_clipboard": true,
   "layers": [
-    {
-      "id": "trabalho",
-      "name": "Trabalho",
-      "color": "#1E6BFF",
-      "columns": 3,
-      "keys": [
-        {"id": "btn_powershell", "label": "PowerShell", "icon": "terminal", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process powershell -WorkingDirectory $HOME"}}},
-        {"id": "btn_claude_zx", "label": "Claude Code ZX", "icon": "rocket", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process powershell -ArgumentList '-NoExit','-Command','claude' -WorkingDirectory (Join-Path $HOME 'zx-control-semana1')"}}},
-        {"id": "btn_vscode_zx", "label": "VS Code ZX", "icon": "code", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "code (Join-Path $HOME 'zx-control-semana1')"}}},
-        {"id": "btn_pasta_zx", "label": "Pasta ZX", "icon": "file", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process explorer (Join-Path $HOME 'zx-control-semana1')"}}},
-        {"id": "btn_github", "label": "GitHub", "icon": "git", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process https://github.com/vicopessoa-boop"}}},
-        {"id": "btn_chrome", "label": "Chrome", "icon": "search", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process chrome"}}},
-        {"id": "btn_salvar", "label": "Salvar", "icon": "save", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "s"]}}},
-        {"id": "btn_copiar", "label": "Copiar", "icon": "file", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "c"]}}},
-        {"id": "btn_colar", "label": "Colar", "icon": "check", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "v"]}}}
-      ]
-    },
-    {
-      "id": "operacao",
-      "name": "Operação ZX",
-      "color": "#00A859",
-      "columns": 3,
-      "keys": [
-        {"id": "btn_zx_status", "label": "Status ZX", "icon": "info", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "git status --short --branch", "cwd": "~/zx-control-semana1"}}},
-        {"id": "btn_zx_pull", "label": "Atualizar ZX", "icon": "down", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "git pull", "cwd": "~/zx-control-semana1"}}},
-        {"id": "btn_docker_ps", "label": "Serviços", "icon": "build", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "docker ps --format '{{.Names}}: {{.Status}}'"}}},
-        {"id": "btn_evolution", "label": "Painel WhatsApp", "icon": "play", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process http://localhost:8080/manager"}}},
-        {"id": "btn_resend", "label": "Resend", "icon": "comment", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process https://resend.com/emails"}}},
-        {"id": "btn_pasta_op", "label": "Pasta Operação", "icon": "file", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process explorer (Join-Path $HOME '.operacao-ia')"}}},
-        {"id": "btn_taskmgr", "label": "Gerenciador", "icon": "bug", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process taskmgr"}}},
-        {"id": "btn_clear", "label": "Limpar tela", "icon": "clear", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "l"]}}},
-        {"id": "btn_interromper", "label": "Interromper", "icon": "stop", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "c"]}}}
-      ]
-    },
-    {
-      "id": "textos",
-      "name": "Textos prontos",
-      "color": "#F2B600",
-      "columns": 3,
-      "keys": [
-        {"id": "txt_ola", "label": "Olá", "icon": "comment", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Olá, $0! Tudo bem? 😊", "indent": false}}},
-        {"id": "txt_followup", "label": "Follow-up", "icon": "next", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Oi, $0! Passando para saber se ficou alguma dúvida. Posso te ajudar com algo?", "indent": false}}},
-        {"id": "txt_obrigado", "label": "Obrigado", "icon": "check", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Muito obrigado pela confiança! Qualquer coisa, é só me chamar. 🙏", "indent": false}}},
-        {"id": "txt_link", "label": "Link pagamento", "icon": "right", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Segue o link para garantir sua vaga: [COLE SEU LINK AQUI]", "indent": false}}},
-        {"id": "txt_pix", "label": "PIX", "icon": "dot", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Chave PIX: [SUA CHAVE AQUI]", "indent": false}}},
-        {"id": "txt_assinatura", "label": "Assinatura", "icon": "edit", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Abraço,\n[SEU NOME]\n[SEU TELEFONE]", "indent": false}}},
-        {"id": "btn_vol_down", "label": "Vol -", "icon": "voldown", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["volumedown"]}}},
-        {"id": "btn_vol_up", "label": "Vol +", "icon": "volup", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["volumeup"]}}},
-        {"id": "btn_mute", "label": "Mudo", "icon": "mute", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mute"]}}}
-      ]
-    }
+    {"id": "trabalho", "name": "Code", "color": "#1E6BFF", "columns": 3, "visor": "claude", "keys": [
+      {"id": "btn_powershell", "label": "PowerShell", "icon": "terminal", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process powershell -WorkingDirectory $HOME"}}},
+      {"id": "btn_claude_zx", "label": "Claude Code ZX", "icon": "rocket", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process powershell -ArgumentList '-NoExit','-Command','claude' -WorkingDirectory (Join-Path $HOME 'zx-control-semana1')"}}},
+      {"id": "btn_vscode_zx", "label": "VS Code ZX", "icon": "code", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "code (Join-Path $HOME 'zx-control-semana1')"}}},
+      {"id": "btn_pasta_zx", "label": "Pasta ZX", "icon": "file", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process explorer (Join-Path $HOME 'zx-control-semana1')"}}},
+      {"id": "btn_github", "label": "GitHub", "icon": "git", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process https://github.com/vicopessoa-boop"}}},
+      {"id": "btn_chrome", "label": "Chrome", "icon": "search", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process chrome"}}},
+      {"id": "btn_salvar", "label": "Salvar", "icon": "save", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "s"]}}},
+      {"id": "btn_copiar", "label": "Copiar", "icon": "file", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "c"]}}},
+      {"id": "btn_colar", "label": "Colar", "icon": "check", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "v"]}}}
+    ]},
+    {"id": "operacao", "name": "ZX Control", "color": "#00A859", "columns": 3, "keys": [
+      {"id": "btn_zx_status", "label": "Status ZX", "icon": "info", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "git status --short --branch", "cwd": "~/zx-control-semana1"}}},
+      {"id": "btn_zx_pull", "label": "Atualizar ZX", "icon": "down", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "git pull", "cwd": "~/zx-control-semana1"}}},
+      {"id": "btn_docker_ps", "label": "Serviços", "icon": "build", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "docker ps --format '{{.Names}}: {{.Status}}'"}}},
+      {"id": "btn_evolution", "label": "Painel WhatsApp", "icon": "play", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process http://localhost:8080/manager"}}},
+      {"id": "btn_resend", "label": "Resend", "icon": "comment", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process https://resend.com/emails"}}},
+      {"id": "btn_pasta_op", "label": "Pasta Operação", "icon": "file", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process explorer (Join-Path $HOME '.operacao-ia')"}}},
+      {"id": "btn_taskmgr", "label": "Gerenciador", "icon": "bug", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process taskmgr"}}},
+      {"id": "btn_clear", "label": "Limpar tela", "icon": "clear", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "l"]}}},
+      {"id": "btn_interromper", "label": "Interromper", "icon": "stop", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "c"]}}}
+    ]},
+    {"id": "textos", "name": "Modelos", "color": "#F2B600", "columns": 3, "keys": [
+      {"id": "txt_ola", "label": "Olá", "icon": "comment", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Olá, $0! Tudo bem? 😊", "indent": false}}},
+      {"id": "txt_followup", "label": "Follow-up", "icon": "next", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Oi, $0! Passando para saber se ficou alguma dúvida. Posso te ajudar com algo?", "indent": false}}},
+      {"id": "txt_obrigado", "label": "Obrigado", "icon": "check", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Muito obrigado pela confiança! Qualquer coisa, é só me chamar. 🙏", "indent": false}}},
+      {"id": "txt_link", "label": "Link pagamento", "icon": "right", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "Segue o link para garantir sua vaga: [COLE SEU LINK AQUI]", "indent": false}}},
+      {"id": "btn_aba_anterior", "label": "Aba anterior", "icon": "left", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "pageup"]}}},
+      {"id": "btn_aba_proxima", "label": "Próxima aba", "icon": "right", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "pagedown"]}}},
+      {"id": "btn_vol_down", "label": "Vol -", "icon": "voldown", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["volumedown"]}}},
+      {"id": "btn_vol_up", "label": "Vol +", "icon": "volup", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["volumeup"]}}},
+      {"id": "btn_mute", "label": "Mudo", "icon": "mute", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mute"]}}}
+    ]}
   ]
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:macropad_usb/models/claude_session.dart';
 import 'package:macropad_usb/models/layer.dart';
 import 'package:macropad_usb/models/macro_action.dart';
 import 'package:macropad_usb/models/status_update.dart';
@@ -109,6 +110,32 @@ void main() {
     await tester.tap(find.text('Pull'));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.textContaining('Sem conexão'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    conn.dispose();
+  });
+
+  testWidgets('visor do Claude mostra o estado de cada sessão', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    final conn = MacropadConnection(port: 1);
+    await tester.pumpWidget(MaterialApp(home: MacropadScreen(connection: conn)));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('CLAUDE CODE'), findsOneWidget);
+
+    conn.claudeSessions.value = [
+      ClaudeSession.fromJson({'id': 'a', 'project': 'zx-control-semana1', 'state': 'waiting', 'updated_ms': 2}),
+      ClaudeSession.fromJson({'id': 'b', 'project': 'macropad-usb', 'state': 'done', 'updated_ms': 1}),
+    ];
+    await tester.pump(const Duration(milliseconds: 100));
+    // Desconectado: o visor avisa em vez de mostrar estados possivelmente velhos.
+    expect(find.text('Desktop desconectado'), findsOneWidget);
+
+    await tester.tap(find.text('2  ${defaultLayers[1].name}'));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('CLAUDE CODE'), findsNothing);
 
     await tester.pumpWidget(const SizedBox());
     conn.dispose();

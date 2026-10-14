@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
+	"github.com/zxmarketingdigital/macropad-usb/desktop-server/internal/claude"
 	"github.com/zxmarketingdigital/macropad-usb/desktop-server/internal/config"
 	"github.com/zxmarketingdigital/macropad-usb/desktop-server/internal/protocol"
 	"github.com/zxmarketingdigital/macropad-usb/desktop-server/internal/runner"
@@ -31,6 +33,7 @@ type Server struct {
 	cfg    config.Config
 	sim    *simulator.Simulator
 	runner *runner.Runner
+	claude *claude.Tracker
 
 	// Ações de teclado passam por uma fila única: a ordem dos toques é preservada
 	// mesmo com mais de um celular conectado, e colagens não se atropelam.
@@ -61,6 +64,7 @@ func New(cfg config.Config, sim *simulator.Simulator, run *runner.Runner) *Serve
 		sim:     sim,
 		runner:  run,
 		input:   make(chan inputJob, 64),
+		claude:  claude.NewTracker(),
 		clients: map[*client]struct{}{},
 	}
 	s.upgrader = websocket.Upgrader{
@@ -78,6 +82,7 @@ func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", s.handleWS)
 	mux.HandleFunc("/", s.handleWS)
+	mux.HandleFunc("/claude", s.handleClaudeHook)
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		s.mu.Lock()
 		n := len(s.clients)
@@ -151,6 +156,33 @@ func (s *Server) handshake(c *client) error {
 	return nil
 }
 
+// handleClaudeHook recebe o JSON dos hooks do Claude Code (via curl --data-binary @-)
+// e atualiza o visor dos celulares conectados.
+func (s *Server) handleClaudeHook(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "use POST", http.StatusMethodNotAllowed)
+		return
+	}
+	// Mesmo critério do WebSocket: navegadores (com Origin) não podem mexer no visor.
+	if r.Header.Get("Origin") != "" {
+		http.Error(w, "origem não permitida", http.StatusForbidden)
+		return
+	}
+	body, _ := io.ReadAll(io.LimitReader(r.Body, maxMsgBytes))
+	in := claude.Decode(body)
+	if ev := r.URL.Query().Get("event"); ev != "" && in.HookEventName == "" {
+		in.HookEventName = ev
+	}
+	if s.claude.Apply(in) {
+		s.broadcast(s.claudeStatus())
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Server) claudeStatus() protocol.ClaudeStatus {
+	return protocol.ClaudeStatus{Type: protocol.TypeClaudeStatus, Sessions: s.claude.Snapshot()}
+}
+
 func (s *Server) greet(c *client) {
 	s.sendJSON(c, map[string]any{
 		"type": protocol.TypeHello, "server": "macropad-usb", "version": Version, "backend": s.sim.Name(),
@@ -158,6 +190,7 @@ func (s *Server) greet(c *client) {
 	if len(s.cfg.Layers) > 0 && string(s.cfg.Layers) != "null" {
 		s.sendJSON(c, protocol.Layout{Type: protocol.TypeLayout, Layers: s.cfg.Layers})
 	}
+	s.sendJSON(c, s.claudeStatus())
 }
 
 func (s *Server) readLoop(c *client) {

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../models/claude_session.dart';
 import '../models/layer.dart';
 import '../models/macro_action.dart';
 import '../models/status_update.dart';
@@ -33,6 +34,9 @@ class MacropadConnection extends ChangeNotifier {
 
   /// Layers enviadas pelo desktop (config.json). Null = usar o layout local.
   final ValueNotifier<List<Layer>?> remoteLayers = ValueNotifier(null);
+
+  /// Sessões do Claude Code (visor). Vazio = nenhuma sessão ativa.
+  final ValueNotifier<List<ClaudeSession>> claudeSessions = ValueNotifier(const []);
 
   final _statusCtrl = StreamController<StatusUpdate>.broadcast();
   Stream<StatusUpdate> get statusUpdates => _statusCtrl.stream;
@@ -155,6 +159,14 @@ class MacropadConnection extends ChangeNotifier {
             debugPrint('LAYOUT inválido: $e');
           }
         }
+      case 'CLAUDE_STATUS':
+        final list = msg['sessions'];
+        if (list is List) {
+          claudeSessions.value = [
+            for (final s in list)
+              if (s is Map) ClaudeSession.fromJson(Map<String, dynamic>.from(s)),
+          ];
+        }
       case 'ERROR':
         lastError = msg['message'] as String?;
         notifyListeners();
@@ -195,6 +207,7 @@ class MacropadConnection extends ChangeNotifier {
     _closeChannel();
     _statusCtrl.close();
     remoteLayers.dispose();
+    claudeSessions.dispose();
     super.dispose();
   }
 }

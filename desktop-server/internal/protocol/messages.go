@@ -12,6 +12,7 @@ const (
 	TypePing         = "PING"
 	TypePong         = "PONG"
 	TypeError        = "ERROR"
+	TypeClaudeStatus = "CLAUDE_STATUS"
 )
 
 // Tipos de ação (campo "action_type").
@@ -124,4 +125,10 @@ type Layout struct {
 type ErrorMsg struct {
 	Type    string `json:"type"`
 	Message string `json:"message"`
+}
+
+// ClaudeStatus lista as sessões do Claude Code e seus estados (visor do app).
+type ClaudeStatus struct {
+	Type     string `json:"type"`
+	Sessions any    `json:"sessions"`
 }
