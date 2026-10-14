@@ -30,7 +30,7 @@ final List<Layer> defaultLayers = [
         icon: 'code',
         action: MacroAction.snippet('try {\n  \$0\n} catch (err) {\n  console.error(err);\n}'),
       ),
-      MacroKey(id: 'btn_save_all', label: 'Save All', icon: 'save', action: MacroAction.combo(['mod', 'alt', 's'])),
+      MacroKey(id: 'btn_save_all', label: 'Salvar', icon: 'save', action: MacroAction.combo(['mod', 's'])),
     ],
   ),
   Layer(

@@ -31,7 +31,7 @@
         {"id": "btn_rename", "label": "Rename", "icon": "edit", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["f2"]}}},
         {"id": "btn_log", "label": "console.log", "icon": "code", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "console.log('DEBUG:', $0);", "indent": true}}},
         {"id": "btn_trycatch", "label": "try/catch", "icon": "code", "action": {"action_type": "PASTE_SNIPPET", "payload": {"text": "try {\n  $0\n} catch (err) {\n  console.error(err);\n}", "indent": true}}},
-        {"id": "btn_save_all", "label": "Save All", "icon": "save", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "alt", "s"]}}}
+        {"id": "btn_save_all", "label": "Salvar", "icon": "save", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "s"]}}}
       ]
     },
     {
