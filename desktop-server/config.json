@@ -1,0 +1,81 @@
+{
+  "listen_addr": "127.0.0.1",
+  "port": 8080,
+  "token": "",
+  "adb": {
+    "enabled": true,
+    "path": "",
+    "watch_interval_sec": 3
+  },
+  "shell": {
+    "enabled": true,
+    "allowlist": [],
+    "default_cwd": "~",
+    "default_timeout_sec": 300,
+    "max_concurrent": 4
+  },
+  "type_delay_ms": 2,
+  "restore_clipboard": true,
+  "layers": [
+    {
+      "id": "vscode",
+      "name": "VS Code",
+      "color": "#00E5FF",
+      "columns": 3,
+      "keys": [
+        { "id": "btn_palette",  "label": "Palette",   "icon": "search",   "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["mod", "shift", "p"] } } },
+        { "id": "btn_quickopen","label": "Quick Open","icon": "file",     "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["mod", "p"] } } },
+        { "id": "btn_terminal", "label": "Terminal",  "icon": "terminal", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "`"] } } },
+        { "id": "btn_comment",  "label": "Comment",   "icon": "comment",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["mod", "/"] } } },
+        { "id": "btn_format",   "label": "Format",    "icon": "format",   "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["shift", "alt", "f"] } } },
+        { "id": "btn_rename",   "label": "Rename",    "icon": "edit",     "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f2"] } } },
+        { "id": "btn_log",      "label": "console.log", "icon": "code", "color": "#FF00E5",
+          "action": { "action_type": "PASTE_SNIPPET", "payload": { "text": "console.log('DEBUG:', $0);", "indent": true } } },
+        { "id": "btn_trycatch", "label": "try/catch", "icon": "code", "color": "#FF00E5",
+          "action": { "action_type": "PASTE_SNIPPET", "payload": { "text": "try {\n  $0\n} catch (err) {\n  console.error(err);\n}", "indent": true } } },
+        { "id": "btn_save_all", "label": "Save All",  "icon": "save",     "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["mod", "alt", "s"] } } }
+      ]
+    },
+    {
+      "id": "git",
+      "name": "Git / Shell",
+      "color": "#7CFF00",
+      "columns": 3,
+      "keys": [
+        { "id": "btn_git_status", "label": "Status",  "icon": "info",   "action": { "action_type": "EXEC_SHELL", "payload": { "command": "git status --short" } } },
+        { "id": "btn_git_pull",   "label": "Pull",    "icon": "down",   "action": { "action_type": "EXEC_SHELL", "payload": { "command": "git pull origin main" } } },
+        { "id": "btn_git_push",   "label": "Push",    "icon": "up",     "color": "#FF6B00", "confirm": true,
+          "action": { "action_type": "EXEC_SHELL", "payload": { "command": "git push" } } },
+        { "id": "btn_docker_build","label": "Docker Build", "icon": "build", "color": "#2496ED",
+          "action": { "action_type": "EXEC_SHELL", "payload": { "command": "docker compose build", "timeout_sec": 900 } } },
+        { "id": "btn_docker_up",  "label": "Compose Up", "icon": "play", "color": "#2496ED",
+          "action": { "action_type": "EXEC_SHELL", "payload": { "command": "docker compose up -d" } } },
+        { "id": "btn_docker_down","label": "Compose Down", "icon": "stop", "color": "#2496ED",
+          "action": { "action_type": "EXEC_SHELL", "payload": { "command": "docker compose down" } } },
+        { "id": "btn_npm_test",   "label": "npm test", "icon": "check", "action": { "action_type": "EXEC_SHELL", "payload": { "command": "npm test" } } },
+        { "id": "btn_clear",      "label": "Clear",    "icon": "clear", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "l"] } } },
+        { "id": "btn_interrupt",  "label": "Ctrl+C",   "icon": "stop",  "color": "#FF2D55", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "c"] } } }
+      ]
+    },
+    {
+      "id": "debug",
+      "name": "Navegação / Debug",
+      "color": "#FFB000",
+      "columns": 4,
+      "keys": [
+        { "id": "btn_dbg_continue", "label": "Continue", "icon": "play",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f5"] } } },
+        { "id": "btn_dbg_over",     "label": "Step Over","icon": "next",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f10"] } } },
+        { "id": "btn_dbg_into",     "label": "Step Into","icon": "down",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f11"] } } },
+        { "id": "btn_dbg_out",      "label": "Step Out", "icon": "up",    "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["shift", "f11"] } } },
+        { "id": "btn_dbg_bp",       "label": "Breakpoint","icon": "dot",  "color": "#FF2D55", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f9"] } } },
+        { "id": "btn_dbg_stop",     "label": "Stop",     "icon": "stop",  "color": "#FF2D55", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["shift", "f5"] } } },
+        { "id": "btn_nav_back",     "label": "Back",     "icon": "left",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "-"] } } },
+        { "id": "btn_nav_def",      "label": "Go to Def","icon": "right", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["f12"] } } },
+        { "id": "btn_tab_prev",     "label": "Prev Tab", "icon": "left",  "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "pageup"] } } },
+        { "id": "btn_tab_next",     "label": "Next Tab", "icon": "right", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["ctrl", "pagedown"] } } },
+        { "id": "btn_vol_down",     "label": "Vol -",    "icon": "voldown","action": { "action_type": "KEY_COMBO", "payload": { "keys": ["volumedown"] } } },
+        { "id": "btn_vol_up",       "label": "Vol +",    "icon": "volup", "action": { "action_type": "KEY_COMBO", "payload": { "keys": ["volumeup"] } } }
+      ]
+    }
+  ]
+}
