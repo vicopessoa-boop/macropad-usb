@@ -14,7 +14,12 @@ final List<Layer> defaultLayers = [
     keys: [
       MacroKey(id: 'btn_palette', label: 'Palette', icon: 'search', action: MacroAction.combo(['f1'])),
       MacroKey(id: 'btn_quickopen', label: 'Quick Open', icon: 'file', action: MacroAction.combo(['mod', 'p'])),
-      MacroKey(id: 'btn_terminal', label: 'Terminal', icon: 'terminal', action: MacroAction.combo(['ctrl', '`'])),
+      MacroKey(
+        id: 'btn_terminal',
+        label: 'PowerShell',
+        icon: 'terminal',
+        action: MacroAction.shell(r'Start-Process powershell -WorkingDirectory $HOME'),
+      ),
       MacroKey(id: 'btn_comment', label: 'Comment', icon: 'comment', action: MacroAction.combo(['mod', '/'])),
       MacroKey(id: 'btn_format', label: 'Format', icon: 'format', action: MacroAction.combo(['shift', 'alt', 'f'])),
       MacroKey(id: 'btn_rename', label: 'Rename', icon: 'edit', action: MacroAction.combo(['f2'])),

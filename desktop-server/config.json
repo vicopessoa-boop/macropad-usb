@@ -25,7 +25,7 @@
       "keys": [
         {"id": "btn_palette", "label": "Palette", "icon": "search", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["f1"]}}},
         {"id": "btn_quickopen", "label": "Quick Open", "icon": "file", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "p"]}}},
-        {"id": "btn_terminal", "label": "Terminal", "icon": "terminal", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["ctrl", "`"]}}},
+        {"id": "btn_terminal", "label": "PowerShell", "icon": "terminal", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process powershell -WorkingDirectory $HOME"}}},
         {"id": "btn_comment", "label": "Comment", "icon": "comment", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "/"]}}},
         {"id": "btn_format", "label": "Format", "icon": "format", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["shift", "alt", "f"]}}},
         {"id": "btn_rename", "label": "Rename", "icon": "edit", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["f2"]}}},
