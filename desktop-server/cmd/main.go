@@ -25,10 +25,20 @@ import (
 func main() {
 	cfgPath := flag.String("config", "config.json", "caminho do config.json")
 	dryRun := flag.Bool("dry-run", false, "não simula teclado: apenas registra as ações no log")
+	logPath := flag.String("log", "", "grava o log neste arquivo (útil rodando em segundo plano, sem janela)")
 	noADB := flag.Bool("no-adb", false, "não gerencia o adb reverse (ex.: usando USB tethering)")
 	port := flag.Int("port", 0, "sobrescreve a porta do config.json")
 	flag.Parse()
 	log.SetFlags(log.Ltime | log.Lmicroseconds)
+	if *logPath != "" {
+		f, err := os.OpenFile(*logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		if err != nil {
+			log.Fatalf("log: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+		log.SetFlags(log.Ldate | log.Ltime)
+	}
 
 	cfg, err := config.Load(*cfgPath)
 	if err != nil {
