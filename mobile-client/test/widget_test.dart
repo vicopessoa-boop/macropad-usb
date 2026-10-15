@@ -199,4 +199,48 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect((taps, holds), (1, 1), reason: 'soltar depois de segurar não dispara a ação normal');
   });
+
+  testWidgets('tecla de voz: grava enquanto segura, envia ao soltar', (tester) async {
+    final key = MacroKey.fromJson({
+      'id': 'btn_voz',
+      'label': 'Voz',
+      'icon': 'mic',
+      'action': {
+        'action_type': 'VOICE',
+        'payload': {'locale': 'pt_BR'}
+      },
+    });
+    expect(key.action.isVoice, isTrue);
+    var started = 0, released = 0;
+    await tester.pumpWidget(MaterialApp(
+      home: Center(
+        child: SizedBox.square(
+          dimension: 120,
+          child: NeonKey(
+            macroKey: key,
+            color: Colors.blue,
+            idle: const AlwaysStoppedAnimation(0),
+            onTrigger: () => started++,
+            onRelease: () => released++,
+          ),
+        ),
+      ),
+    ));
+    final g = await tester.startGesture(tester.getCenter(find.byType(NeonKey)));
+    await tester.pump(const Duration(milliseconds: 50));
+    expect((started, released), (1, 0), reason: 'começa a gravar ao apertar');
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect((started, released), (1, 0), reason: 'segurar não dispara nada a mais');
+    await g.up();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect((started, released), (1, 1), reason: 'soltar encerra e envia');
+  });
+
+  test('teclas "spacer" ocupam lugar na grade sem ação', () {
+    final k = MacroKey.fromJson({'id': 'vazio', 'spacer': true});
+    expect(k.spacer, isTrue);
+    expect(k.action.actionType, 'NONE');
+  });
 }

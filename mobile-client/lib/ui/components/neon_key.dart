@@ -31,6 +31,9 @@ class NeonKey extends StatefulWidget {
   /// Chamado ao segurar a tecla pelo tempo de `hold_ms` (só teclas com `hold_action`).
   final VoidCallback? onHoldTrigger;
 
+  /// Teclas de voz (push-to-talk): [onTrigger] ao apertar e este ao soltar.
+  final VoidCallback? onRelease;
+
   const NeonKey({
     super.key,
     required this.macroKey,
@@ -38,6 +41,7 @@ class NeonKey extends StatefulWidget {
     required this.idle,
     required this.onTrigger,
     this.onHoldTrigger,
+    this.onRelease,
     this.status,
     this.phase = 0,
     this.enabled = true,
@@ -119,6 +123,8 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     }
   }
 
+  bool get _pushToTalk => widget.macroKey.action.isVoice && widget.onRelease != null;
+
   bool get _hasHold => widget.macroKey.holdAction != null && widget.onHoldTrigger != null;
 
   void _fireHold() {
@@ -147,7 +153,10 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     _touch = e.localPosition;
     _firedThisPress = false;
     _press.forward();
-    if (widget.macroKey.confirm) {
+    if (_pushToTalk) {
+      // Grava enquanto o dedo estiver na tecla.
+      _fire();
+    } else if (widget.macroKey.confirm) {
       HapticFeedback.selectionClick();
       _hold.duration = _holdDuration;
       _hold.forward(from: 0);
@@ -164,7 +173,10 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     if (e.pointer != _pointer) return;
     _pointer = null;
     _press.reverse();
-    if (_hasHold && !_firedThisPress) {
+    if (_pushToTalk) {
+      HapticFeedback.mediumImpact();
+      widget.onRelease!();
+    } else if (_hasHold && !_firedThisPress) {
       _hold.value = 0;
       _fire();
       HapticFeedback.lightImpact();

@@ -5,6 +5,9 @@ class MacroAction {
   static const execShell = 'EXEC_SHELL';
   static const typeText = 'TYPE_TEXT';
 
+  /// Ditado pelo microfone do celular; tratado no app (não vai ao desktop como está).
+  static const voice = 'VOICE';
+
   final String actionType;
   final Map<String, dynamic> payload;
 
@@ -33,4 +36,5 @@ class MacroAction {
       };
 
   bool get isShell => actionType == execShell;
+  bool get isVoice => actionType == voice;
 }

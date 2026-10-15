@@ -9,6 +9,7 @@ import '../models/macro_key.dart';
 import '../models/status_update.dart';
 import '../services/default_layers.dart';
 import '../services/macropad_connection.dart';
+import '../services/voice_service.dart';
 import 'components/claude_visor.dart';
 import 'components/connection_badge.dart';
 import 'components/layer_bar.dart';
@@ -33,6 +34,13 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
   int _current = 0;
   final Map<String, StatusUpdate> _statuses = {};
   StatusUpdate? _console;
+
+  // Ditado (tecla de voz, aperte e segure para falar).
+  final VoiceService _voice = VoiceService();
+  bool _voiceHeld = false;
+  bool _voiceFinished = true;
+  String _voicePartial = '';
+  Timer? _voiceTimeout;
   late final StreamSubscription<StatusUpdate> _statusSub;
 
   MacropadConnection get _conn => widget.connection;
@@ -63,22 +71,94 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
     });
   }
 
-  void _trigger(MacroKey key, [MacroAction? action]) {
-    if (!_conn.sendAction(key.id, action ?? key.action)) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('Sem conexão com o desktop. Verifique o cabo e o daemon.'),
-            duration: Duration(milliseconds: 1500),
-          ),
-        );
+  void _setLocalStatus(MacroKey key, KeyStatus st, String msg) {
+    setState(() {
+      final s = StatusUpdate(buttonId: key.id, status: st, color: StatusUpdate.defaultColor(st), message: msg);
+      _statuses[key.id] = s;
+      _console = s;
+    });
+  }
+
+  /// Apertou a tecla de voz: começa a ouvir.
+  Future<void> _voiceStart(MacroKey key) async {
+    if (_conn.phase != ConnectionPhase.connected) {
+      _showNoConnection();
+      return;
     }
+    _voiceHeld = true;
+    _voiceFinished = false;
+    _voicePartial = '';
+    _voiceTimeout?.cancel();
+    _setLocalStatus(key, KeyStatus.running, '🎤 Ouvindo… solte para enviar');
+    final ok = await _voice.start(
+      localeId: (key.action.payload['locale'] as String?) ?? 'pt_BR',
+      onPartial: (t) {
+        _voicePartial = t;
+        if (!_voiceFinished) _setLocalStatus(key, KeyStatus.running, '🎤 $t');
+      },
+      onFinal: (t) => _voiceFinish(key, t.isNotEmpty ? t : _voicePartial),
+      onError: (e) {
+        if (!_voiceFinished && _voicePartial.isEmpty) {
+          _voiceFinished = true;
+          _setLocalStatus(key, KeyStatus.error, 'Não entendi ($e). Tente de novo.');
+        }
+      },
+    );
+    if (!ok) {
+      _voiceFinished = true;
+      _setLocalStatus(key, KeyStatus.error, 'Microfone indisponível: permita o acesso ao microfone para o Ananda.');
+      return;
+    }
+    // Soltou antes de o microfone terminar de abrir.
+    if (!_voiceHeld) _voiceStop(key);
+  }
+
+  /// Soltou a tecla de voz: para de ouvir e envia o texto.
+  void _voiceStop(MacroKey key) {
+    _voiceHeld = false;
+    if (_voiceFinished) return;
+    _voice.stop();
+    // Se o resultado final não vier, usa o último texto parcial.
+    _voiceTimeout?.cancel();
+    _voiceTimeout = Timer(const Duration(milliseconds: 2500), () => _voiceFinish(key, _voicePartial));
+  }
+
+  void _voiceFinish(MacroKey key, String text) {
+    if (_voiceFinished) return;
+    _voiceFinished = true;
+    _voiceTimeout?.cancel();
+    if (text.trim().isEmpty) {
+      _setLocalStatus(key, KeyStatus.error, 'Nada reconhecido. Segure a tecla enquanto fala.');
+      return;
+    }
+    // Cola o texto na janela em foco do computador (ex.: Claude Code).
+    _setLocalStatus(key, KeyStatus.running, '🎤 $text');
+    _conn.sendAction(key.id, MacroAction.snippet(text, indent: false));
+  }
+
+  void _trigger(MacroKey key, [MacroAction? action]) {
+    if ((action ?? key.action).isVoice) {
+      _voiceStart(key);
+      return;
+    }
+    if (!_conn.sendAction(key.id, action ?? key.action)) _showNoConnection();
+  }
+
+  void _showNoConnection() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Sem conexão com o desktop. Verifique o cabo e o daemon.'),
+          duration: Duration(milliseconds: 1500),
+        ),
+      );
   }
 
   @override
   void dispose() {
     _statusSub.cancel();
+    _voiceTimeout?.cancel();
     _conn.remoteLayers.removeListener(_onRemoteLayers);
     _idle.dispose();
     super.dispose();
@@ -155,6 +235,7 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
                       idle: _idle,
                       enabled: _conn.phase == ConnectionPhase.connected,
                       onTrigger: _trigger,
+                      onVoiceRelease: _voiceStop,
                     ),
                   ),
                 ),
@@ -175,6 +256,7 @@ class _KeyGrid extends StatelessWidget {
   final Animation<double> idle;
   final bool enabled;
   final void Function(MacroKey, [MacroAction?]) onTrigger;
+  final void Function(MacroKey) onVoiceRelease;
 
   const _KeyGrid({
     super.key,
@@ -183,6 +265,7 @@ class _KeyGrid extends StatelessWidget {
     required this.idle,
     required this.enabled,
     required this.onTrigger,
+    required this.onVoiceRelease,
   });
 
   @override
@@ -225,6 +308,7 @@ class _KeyGrid extends StatelessWidget {
   Widget? _buildKey(int index, int cols) {
     if (index >= layer.keys.length) return null;
     final k = layer.keys[index];
+    if (k.spacer) return null;
     return NeonKey(
       key: ValueKey(k.id),
       macroKey: k,
@@ -236,6 +320,7 @@ class _KeyGrid extends StatelessWidget {
       enabled: enabled,
       onTrigger: () => onTrigger(k),
       onHoldTrigger: k.holdAction == null ? null : () => onTrigger(k, k.holdAction),
+      onRelease: k.action.isVoice ? () => onVoiceRelease(k) : null,
     );
   }
 }

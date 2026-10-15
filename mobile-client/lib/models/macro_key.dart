@@ -20,6 +20,9 @@ class MacroKey {
   final MacroAction? holdAction;
   final int holdMs;
 
+  /// Espaço vazio na grade (para posicionar teclas, ex.: só no meio da linha).
+  final bool spacer;
+
   const MacroKey({
     required this.id,
     required this.label,
@@ -29,6 +32,7 @@ class MacroKey {
     this.confirm = false,
     this.holdAction,
     this.holdMs = 2000,
+    this.spacer = false,
   });
 
   factory MacroKey.fromJson(Map<String, dynamic> json) => MacroKey(
@@ -37,7 +41,10 @@ class MacroKey {
         icon: json['icon'] as String?,
         color: parseHexColor(json['color'] as String?),
         confirm: json['confirm'] as bool? ?? false,
-        action: MacroAction.fromJson(Map<String, dynamic>.from(json['action'] as Map)),
+        spacer: json['spacer'] as bool? ?? false,
+        action: json['action'] is Map
+            ? MacroAction.fromJson(Map<String, dynamic>.from(json['action'] as Map))
+            : const MacroAction('NONE', {}),
         holdAction: json['hold_action'] is Map
             ? MacroAction.fromJson(Map<String, dynamic>.from(json['hold_action'] as Map))
             : null,
@@ -58,6 +65,7 @@ Color? parseHexColor(String? hex) {
 /// Ícones disponíveis para o campo "icon" do layout.
 const Map<String, IconData> keyIcons = {
   'search': Icons.search_rounded,
+  'mic': Icons.mic_rounded,
   'file': Icons.insert_drive_file_outlined,
   'terminal': Icons.terminal_rounded,
   'comment': Icons.comment_outlined,

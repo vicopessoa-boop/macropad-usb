@@ -16,7 +16,10 @@
       {"id": "btn_chrome", "label": "Chrome", "icon": "search", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process chrome"}}},
       {"id": "btn_salvar", "label": "Salvar", "icon": "save", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "s"]}}},
       {"id": "btn_copiar", "label": "Copiar", "icon": "file", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "c"]}}},
-      {"id": "btn_colar", "label": "Colar", "icon": "check", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "v"]}}}
+      {"id": "btn_colar", "label": "Colar", "icon": "check", "action": {"action_type": "KEY_COMBO", "payload": {"keys": ["mod", "v"]}}},
+      {"id": "vazio_voz_1", "spacer": true},
+      {"id": "btn_voz", "label": "Voz", "icon": "mic", "action": {"action_type": "VOICE", "payload": {"locale": "pt_BR"}}},
+      {"id": "vazio_voz_2", "spacer": true}
     ]},
     {"id": "operacao", "name": "ZX Control", "color": "#00A859", "columns": 3, "keys": [
       {"id": "btn_zx_status", "label": "Status ZX", "icon": "info", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "git status --short --branch", "cwd": "~/zx-control-semana1"}}},
