@@ -101,6 +101,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: MacropadScreen(connection: conn)));
     await tester.pump(const Duration(milliseconds: 100));
 
+    expect(find.text('ANANDA'), findsOneWidget);
     expect(find.text('Palette'), findsOneWidget);
     expect(find.text('Desconectado'), findsOneWidget);
 

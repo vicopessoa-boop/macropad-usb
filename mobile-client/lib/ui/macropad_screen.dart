@@ -111,7 +111,7 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
                   children: [
                     const Flexible(
                       child: Text(
-                        'MACROPAD',
+                        'ANANDA',
                         maxLines: 1,
                         softWrap: false,
                         overflow: TextOverflow.fade,

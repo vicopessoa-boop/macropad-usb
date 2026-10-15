@@ -2,7 +2,7 @@
     <!-- WebSocket com o daemon (localhost via adb reverse ou IP do USB tethering). -->
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="Macropad USB"
+        android:label="Ananda"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

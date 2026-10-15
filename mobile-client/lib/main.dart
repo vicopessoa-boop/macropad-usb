@@ -23,7 +23,7 @@ class MacropadApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Macropad USB',
+      title: 'Ananda',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
