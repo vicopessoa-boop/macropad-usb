@@ -8,8 +8,8 @@
   "restore_clipboard": true,
   "layers": [
     {"id": "trabalho", "name": "Code", "color": "#1E6BFF", "columns": 3, "visor": "claude", "keys": [
-      {"id": "btn_powershell", "label": "Terminal", "icon": "terminal", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "powershell -NoProfile -ExecutionPolicy Bypass -File C:/macropad-windows-8091/macropad-windows/janela.ps1 -Id terminal -Titulo 'Macropad Terminal'"}}},
-      {"id": "btn_claude_zx", "label": "Claude Code", "icon": "rocket", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "powershell -NoProfile -ExecutionPolicy Bypass -File C:/macropad-windows-8091/macropad-windows/janela.ps1 -Id claude-zx -Titulo 'Macropad Claude' -Dir (Join-Path $HOME 'zx-control-semana1') -Comando claude"}}},
+      {"id": "btn_powershell", "label": "Terminal", "icon": "terminal", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "powershell -NoProfile -ExecutionPolicy Bypass -File C:/macropad-windows-8091/macropad-windows/janela.ps1 -Id terminal -Titulo 'Macropad Terminal'"}}, "hold_action": {"action_type": "KEY_COMBO", "payload": {"keys": ["enter"]}}, "hold_ms": 2000},
+      {"id": "btn_claude_zx", "label": "Claude Code", "icon": "rocket", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "powershell -NoProfile -ExecutionPolicy Bypass -File C:/macropad-windows-8091/macropad-windows/janela.ps1 -Id claude-zx -Titulo 'Macropad Claude' -Dir (Join-Path $HOME 'zx-control-semana1') -Comando claude"}}, "hold_action": {"action_type": "KEY_COMBO", "payload": {"keys": ["enter"]}}, "hold_ms": 2000},
       {"id": "btn_vscode_zx", "label": "VS Code ZX", "icon": "code", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "code (Join-Path $HOME 'zx-control-semana1')"}}},
       {"id": "btn_pasta_zx", "label": "Pasta ZX", "icon": "file", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process explorer (Join-Path $HOME 'zx-control-semana1')"}}},
       {"id": "btn_github", "label": "GitHub", "icon": "git", "action": {"action_type": "EXEC_SHELL", "payload": {"command": "Start-Process https://github.com/vicopessoa-boop"}}},

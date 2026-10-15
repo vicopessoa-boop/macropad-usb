@@ -7,9 +7,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:macropad_usb/models/claude_session.dart';
 import 'package:macropad_usb/models/layer.dart';
 import 'package:macropad_usb/models/macro_action.dart';
+import 'package:macropad_usb/models/macro_key.dart';
 import 'package:macropad_usb/models/status_update.dart';
 import 'package:macropad_usb/services/default_layers.dart';
 import 'package:macropad_usb/services/macropad_connection.dart';
+import 'package:macropad_usb/ui/components/neon_key.dart';
 import 'package:macropad_usb/ui/macropad_screen.dart';
 
 void main() {
@@ -139,5 +141,61 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     conn.dispose();
+  });
+
+  testWidgets('tecla com hold_action: toque rápido abre, segurar 2 s manda Enter', (tester) async {
+    final key = MacroKey.fromJson({
+      'id': 'btn_terminal',
+      'label': 'Terminal',
+      'action': {
+        'action_type': 'EXEC_SHELL',
+        'payload': {'command': 'abrir'}
+      },
+      'hold_action': {
+        'action_type': 'KEY_COMBO',
+        'payload': {
+          'keys': ['enter']
+        }
+      },
+      'hold_ms': 2000,
+    });
+    expect(key.holdAction?.payload['keys'], ['enter']);
+    var taps = 0, holds = 0;
+    await tester.pumpWidget(MaterialApp(
+      home: Center(
+        child: SizedBox.square(
+          dimension: 120,
+          child: NeonKey(
+            macroKey: key,
+            color: Colors.blue,
+            idle: const AlwaysStoppedAnimation(0),
+            onTrigger: () => taps++,
+            onHoldTrigger: () => holds++,
+          ),
+        ),
+      ),
+    ));
+
+    // Toque rápido: dispara a ação normal ao soltar.
+    var g = await tester.startGesture(tester.getCenter(find.byType(NeonKey)));
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(taps, 0, reason: 'a ação normal espera o soltar');
+    await g.up();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect((taps, holds), (1, 0));
+
+    // Segurar 2 s: dispara só a ação de segurar (Enter).
+    g = await tester.startGesture(tester.getCenter(find.byType(NeonKey)));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(holds, 0, reason: '1 s ainda não basta');
+    for (var i = 0; i < 12; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(holds, 1);
+    await g.up();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect((taps, holds), (1, 1), reason: 'soltar depois de segurar não dispara a ação normal');
   });
 }

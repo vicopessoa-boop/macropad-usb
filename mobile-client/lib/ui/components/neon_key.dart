@@ -17,6 +17,8 @@ import '../palette.dart';
 /// - Release: a luz dissipa devagar + HapticFeedback.lightImpact.
 /// - STATUS_UPDATE: RUNNING pulsa na cor do status; SUCCESS/ERROR acendem e esmaecem.
 /// - Teclas com `confirm`: é preciso segurar ~0,6 s (anel de progresso na borda).
+/// - Teclas com `hold_action`: toque rápido = ação normal (ao soltar); segurar
+///   `hold_ms` (padrão 2 s) = ação extra, com anel de progresso e vibração.
 class NeonKey extends StatefulWidget {
   final MacroKey macroKey;
   final Color color;
@@ -26,12 +28,16 @@ class NeonKey extends StatefulWidget {
   final bool enabled;
   final VoidCallback onTrigger;
 
+  /// Chamado ao segurar a tecla pelo tempo de `hold_ms` (só teclas com `hold_action`).
+  final VoidCallback? onHoldTrigger;
+
   const NeonKey({
     super.key,
     required this.macroKey,
     required this.color,
     required this.idle,
     required this.onTrigger,
+    this.onHoldTrigger,
     this.status,
     this.phase = 0,
     this.enabled = true,
@@ -72,8 +78,11 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _hold.addStatusListener((s) {
-      if (s == AnimationStatus.completed && _pointer != null && !_firedThisPress) {
+      if (s != AnimationStatus.completed || _pointer == null || _firedThisPress) return;
+      if (widget.macroKey.confirm) {
         _fire();
+      } else if (_hasHold) {
+        _fireHold();
       }
     });
     _applyStatus(widget.status);
@@ -110,6 +119,15 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     }
   }
 
+  bool get _hasHold => widget.macroKey.holdAction != null && widget.onHoldTrigger != null;
+
+  void _fireHold() {
+    _firedThisPress = true;
+    HapticFeedback.heavyImpact();
+    _ripple.forward(from: 0);
+    widget.onHoldTrigger!();
+  }
+
   void _fire() {
     _firedThisPress = true;
     HapticFeedback.heavyImpact();
@@ -131,6 +149,11 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     _press.forward();
     if (widget.macroKey.confirm) {
       HapticFeedback.selectionClick();
+      _hold.duration = _holdDuration;
+      _hold.forward(from: 0);
+    } else if (_hasHold) {
+      // A ação normal espera o soltar: só assim dá para saber se foi toque ou segurar.
+      _hold.duration = Duration(milliseconds: widget.macroKey.holdMs);
       _hold.forward(from: 0);
     } else {
       _fire();
@@ -141,7 +164,11 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
     if (e.pointer != _pointer) return;
     _pointer = null;
     _press.reverse();
-    if (widget.macroKey.confirm && !_firedThisPress) {
+    if (_hasHold && !_firedThisPress) {
+      _hold.value = 0;
+      _fire();
+      HapticFeedback.lightImpact();
+    } else if (widget.macroKey.confirm && !_firedThisPress) {
       _hold.animateBack(0, duration: const Duration(milliseconds: 180));
     } else {
       _hold.value = 0;
@@ -200,19 +227,37 @@ class _NeonKeyState extends State<NeonKey> with TickerProviderStateMixin {
                   press: press,
                   ripple: _ripple.isAnimating ? _ripple.value : 0,
                   touch: _touch,
-                  hold: key.confirm ? _hold.value : 0,
+                  // Teclas com hold_action: o anel só aparece depois de um instante, para um
+                  // toque rápido não piscar o anel.
+                  hold: key.confirm
+                      ? _hold.value
+                      : _hasHold
+                          ? ((_hold.value - 0.12) / 0.88).clamp(0.0, 1.0)
+                          : 0,
                 ),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(6, 6 + dy, 6, 14 - dy),
-                  child: _Legend(
-                    label: key.label,
-                    icon: icon,
-                    color: light,
-                    glow: glow,
-                    press: press,
-                    enabled: widget.enabled,
-                    badge: _badge(s, statusMix),
-                  ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(6, 6 + dy, 6, 14 - dy),
+                      child: _Legend(
+                        label: key.label,
+                        icon: icon,
+                        color: light,
+                        glow: glow,
+                        press: press,
+                        enabled: widget.enabled,
+                        badge: _badge(s, statusMix),
+                      ),
+                    ),
+                    // Indica que segurar a tecla tem uma segunda função (Enter).
+                    if (_hasHold)
+                      Positioned(
+                        top: 9 + dy,
+                        right: 11,
+                        child: Icon(Icons.keyboard_return_rounded, size: 14, color: light.withValues(alpha: 0.75)),
+                      ),
+                  ],
                 ),
               );
             },

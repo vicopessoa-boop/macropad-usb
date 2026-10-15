@@ -15,6 +15,11 @@ class MacroKey {
   final bool confirm;
   final MacroAction action;
 
+  /// Ação extra ao segurar a tecla por [holdMs] (ex.: Enter). Com ela, o toque
+  /// rápido dispara [action] ao soltar, e segurar dispara [holdAction].
+  final MacroAction? holdAction;
+  final int holdMs;
+
   const MacroKey({
     required this.id,
     required this.label,
@@ -22,6 +27,8 @@ class MacroKey {
     this.icon,
     this.color,
     this.confirm = false,
+    this.holdAction,
+    this.holdMs = 2000,
   });
 
   factory MacroKey.fromJson(Map<String, dynamic> json) => MacroKey(
@@ -31,6 +38,10 @@ class MacroKey {
         color: parseHexColor(json['color'] as String?),
         confirm: json['confirm'] as bool? ?? false,
         action: MacroAction.fromJson(Map<String, dynamic>.from(json['action'] as Map)),
+        holdAction: json['hold_action'] is Map
+            ? MacroAction.fromJson(Map<String, dynamic>.from(json['hold_action'] as Map))
+            : null,
+        holdMs: ((json['hold_ms'] as num?)?.toInt() ?? 2000).clamp(300, 10000),
       );
 }
 

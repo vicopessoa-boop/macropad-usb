@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../models/layer.dart';
+import '../models/macro_action.dart';
 import '../models/macro_key.dart';
 import '../models/status_update.dart';
 import '../services/default_layers.dart';
@@ -62,8 +63,8 @@ class _MacropadScreenState extends State<MacropadScreen> with SingleTickerProvid
     });
   }
 
-  void _trigger(MacroKey key) {
-    if (!_conn.sendAction(key.id, key.action)) {
+  void _trigger(MacroKey key, [MacroAction? action]) {
+    if (!_conn.sendAction(key.id, action ?? key.action)) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -173,7 +174,7 @@ class _KeyGrid extends StatelessWidget {
   final Map<String, StatusUpdate> statuses;
   final Animation<double> idle;
   final bool enabled;
-  final void Function(MacroKey) onTrigger;
+  final void Function(MacroKey, [MacroAction?]) onTrigger;
 
   const _KeyGrid({
     super.key,
@@ -234,6 +235,7 @@ class _KeyGrid extends StatelessWidget {
       phase: ((index ~/ cols) + (index % cols)) * 0.08,
       enabled: enabled,
       onTrigger: () => onTrigger(k),
+      onHoldTrigger: k.holdAction == null ? null : () => onTrigger(k, k.holdAction),
     );
   }
 }

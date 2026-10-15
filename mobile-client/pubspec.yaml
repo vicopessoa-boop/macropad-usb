@@ -1,7 +1,7 @@
 name: macropad_usb
 description: Macropad mecânico virtual com iluminação RGB que controla o desktop via cabo USB.
 publish_to: "none"
-version: 0.3.0+3
+version: 0.4.0+4
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
